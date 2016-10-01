@@ -1,0 +1,9 @@
+{% extends 'app.php.twig' %}
+
+{% block widget %}
+{% if is_granted('ROLE_USER') %}
+    <p>Админ может видеть это!</p>
+{% endif %}
+Не админ
+
+{% endblock %}

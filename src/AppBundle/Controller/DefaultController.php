@@ -2,6 +2,8 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Entity\Country;
+
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,6 +15,10 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+
 
 class DefaultController extends Controller
 {
@@ -22,18 +28,17 @@ class DefaultController extends Controller
     public function indexAction(Request $request)
     {
 
-        //$this->denyAccessUnlessGranted('ROLE_USER', null, 'Unable to access this page!'); //redirect if ROLE not admin
-        /*
-        if (!$this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
-            throw $this->createAccessDeniedException();
-        }
-        */
-        // create a task and give it some dummy data for this example
         $user = new User();
-
-
-
-
+        $em = $this->getDoctrine()->getManager();
+        $query = $em->createQuery(
+                'SELECT p.id,p.code,p.name
+                 FROM AppBundle:Country p'
+                    );
+        $all_country = $query->getResult();
+        $sort_country = array();
+        foreach ($all_country as $val){
+            $sort_country[$val['name']] = $val['id'];
+        }
         $form = $this->createFormBuilder($user)
 
             ->add('username', TextType::class,array(
@@ -43,17 +48,19 @@ class DefaultController extends Controller
                     'class' => 'form-control'
                 )
             ))
-            // If you use PHP 5.3 or 5.4 you must use
-            // ->add('task', 'Symfony\Component\Form\Extension\Core\Type\TextType')
-            /*
-        ->add('email', TextType::class,array(
-            'required' => true,
-            'attr' => array(
-                'maxlength' => 20,
-                'class' => 'form-control'
-            )
-        ))*/
-            ->add('password', TextType::class,array(
+
+            ->add('email', EmailType::class,array(
+                'required' => true,
+                'attr' => array(
+                    'maxlength' => 30,
+                    'class' => 'form-control'
+                )
+            ))
+            ->add('country', ChoiceType::class, array(
+                'choices' => $sort_country//$country
+
+            ))
+            ->add('password', PasswordType::class,array(
                 'required' => true,
                 'attr' => array(
                     'maxlength' => 20,
@@ -63,34 +70,35 @@ class DefaultController extends Controller
             ->add('save', SubmitType::class, array('label' => 'Create Task'))
             ->getForm();
         $form->handleRequest($request);
-
         $validator = $this->get('validator');
         $errors = $validator->validate($user);
 
-        if (count($errors) > 0) {
-            return $this->render('default/test.html.twig', array(
-                'reg_form' =>  $form->createView(),
-                'errors' => $errors,
-            ));
-
-        }
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $repository = $this->getDoctrine()->getRepository('AppBundle:User');
-            $check_duplicat = $repository->findOneByUsername($form["username"]->getData());
 
-            if($check_duplicat){
+
+            $repository = $this->getDoctrine()->getRepository('AppBundle:User');
+            $check_duplicat_name = $repository->findOneByUsername($form["username"]->getData());
+
+            if($check_duplicat_name){
                 $request->getSession()
                     ->getFlashBag()
-                    ->add('success', 'Email already exist!')
+                    ->add('error', 'Username already exist!')
                 ;
-
                 $url = $this->generateUrl('_homepage');
-
                 return $this->redirect($url);
-            } else {
-                //save form data to database
+            }
+            $check_duplicat_email = $repository->findOneByEmail($form["email"]->getData());
+            if($check_duplicat_email){
+                $request->getSession()
+                    ->getFlashBag()
+                    ->add('error', 'Email already exist!')
+                ;
+                $url = $this->generateUrl('_homepage');
+                return $this->redirect($url);
+            }
 
+                //save form data to database
                 $user = $form->getData();
                 $em = $this->getDoctrine()->getManager();
 
@@ -100,6 +108,7 @@ class DefaultController extends Controller
                 $pwd=$encoder->encodePassword($user, $pwd);
                 $user->setPassword($pwd);
                 $user->setRoles('ROLE_USER'); //default role
+
                 $em->persist($user);
                 $em->flush();
                 $request->getSession()
@@ -108,17 +117,19 @@ class DefaultController extends Controller
                 ;
                 return $this->redirectToRoute('_homepage');
 
-            }
+        } else {
+
+
+            //load view with parameter
+
+            return $this->render('default/test.html.twig', array(
+                'reg_form' => $form->createView(),
+                'errors' => $errors
+            ));
 
         }
 
 
-
-        //load view with parameter
-        return $this->render('default/test.html.twig', array(
-            'base_dir' => realpath($this->container->getParameter('kernel.root_dir').'/..').DIRECTORY_SEPARATOR,
-            'reg_form' =>  $form->createView()
-        ));
 
     }
     /**

@@ -16,4 +16,17 @@ class UserRepository extends EntityRepository implements UserLoaderInterface
             ->getQuery()
             ->getOneOrNullResult();
     }
+
+    public function loadUserData()
+    {
+        $em = $this->getDoctrine()->getManager();
+        $query = $em->createQuery(
+               'SELECT p.id,p.username
+                FROM AppBundle:User p
+                LEFT JOIN  AppBundle:Country c ON c.id = p.country
+                '
+        );
+
+        return $all_country = $query->getResult();
+    }
 }

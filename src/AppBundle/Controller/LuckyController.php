@@ -15,8 +15,9 @@ class LuckyController extends Controller
     {
         $number = mt_rand(0, 100);
 
-        return $this->render('default/test.html.twig', array(
+        return $this->render('lucky_number/number.html.twig', array(
             'base_dir' => realpath($this->container->getParameter('kernel.root_dir').'/..').DIRECTORY_SEPARATOR,
+            'number' => $number
         ));
 
         /******* redirect

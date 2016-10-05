@@ -45,13 +45,13 @@ class SecurityController extends Controller
     }
 
 
-	/**
-	 * @Route("/logout", name="logout")
-	 */
-	public function logoutAction() //logout actiov -> symfony core method
-	{
+    /**
+     * @Route("/logout", name="logout")
+     */
+    public function logoutAction() //logout actiov -> symfony core method
+    {
 
-	}
+    }
 
 
 

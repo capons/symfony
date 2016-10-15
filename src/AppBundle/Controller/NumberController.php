@@ -6,16 +6,18 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 
-class LuckyController extends Controller
+class NumberController extends Controller
 {
     /**
      * @Route("/lucky/number",name="_number")
      */
     public function numberAction()
     {
+
+
         $number = mt_rand(0, 100);
 
-        return $this->render('lucky_number/number.html.twig', array(
+        return $this->render('number/number.html.twig', array(
             'base_dir' => realpath($this->container->getParameter('kernel.root_dir').'/..').DIRECTORY_SEPARATOR,
             'number' => $number
         ));

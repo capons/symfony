@@ -39,6 +39,7 @@ class DefaultController extends Controller
         foreach ($all_country as $val){
             $sort_country[$val['name']] = $val['id'];
         }
+        //create form
         $form = $this->createFormBuilder($user)
 
             ->add('username', TextType::class,array(
@@ -136,16 +137,44 @@ class DefaultController extends Controller
      * @Route("/admin",name="admin")
      */
 
-    public function adminAction()
+    public function adminAction(Request $request)
     {
         $authorizationChecker = $this->get('security.authorization_checker');
 
-        // check for edit access
+        // check for auth user access
         if (false === $authorizationChecker->isGranted('ROLE_USER')) {
             //throw new AccessDeniedException();
+            $request->getSession()
+                ->getFlashBag()
+                ->add('error', 'You have no permission!')
+            ;
             return $this->redirectToRoute('_homepage');
         }
-        return $this->render('admin/admin.html.twig');
+
+        //check if user login
+
+        $securityContext = $this->container->get('security.authorization_checker');
+        if ($securityContext->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+            $user = $this->getUser();
+            echo $user->getId();
+        }
+
+        /*
+        $repository = $this->getDoctrine()
+            ->getRepository('AppBundle:User')
+            ->createQueryBuilder('e')
+            ->select('e.id,e.username,co.name')
+            ->leftJoin('AppBundle:Country', 'co', 'WITH', 'co.id = e.country')
+            ->getQuery()
+            ->getResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
+
+        echo '<pre>';
+        print_r($repository);
+        echo '</pre>';
+        */
+        return $this->render('admin/admin.html.twig',array(
+            'test' => 'test'
+        ));
         //return new Response('<html><body>Admin page!</body></html>');
     }
 

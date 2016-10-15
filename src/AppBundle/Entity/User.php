@@ -4,7 +4,7 @@ namespace AppBundle\Entity;
 use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
-
+use AppBundle\Entity\Country;
 
 
 
@@ -47,10 +47,9 @@ class User implements UserInterface, \Serializable
 
     /**
      * @ORM\Column(type="integer", length=60)
-     * @ORM\JoinColumn(name="country", referencedColumnName="id")
+     *
      */
     private $country;
-
 
 
 

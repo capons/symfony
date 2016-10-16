@@ -4,6 +4,8 @@ namespace AppBundle\Entity;
 
 use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use AppBundle\Entity\User;
 
 /**
  * User
@@ -20,6 +22,8 @@ class Country
      */
     private $id;
 
+
+
     /**
      * @ORM\Column(type="string", length=64)
      *
@@ -30,6 +34,8 @@ class Country
      * @ORM\Column(type="string", length=10)
      */
     private $code;
+
+
 
     public function getId()
     {

@@ -8,6 +8,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use AppBundle\Entity\User;
+use AppBundle\Entity\Product;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
@@ -27,7 +28,7 @@ class DefaultController extends Controller
      */
     public function indexAction(Request $request)
     {
-
+        //$request->query->get('id'); retrive post get data example
         $user = new User();
         $em = $this->getDoctrine()->getManager();
         $query = $em->createQuery(
@@ -156,7 +157,7 @@ class DefaultController extends Controller
         $securityContext = $this->container->get('security.authorization_checker');
         if ($securityContext->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
             $user = $this->getUser();
-            echo $user->getId();
+           // echo $user->getId();
         }
 
         /*
@@ -172,10 +173,96 @@ class DefaultController extends Controller
         print_r($repository);
         echo '</pre>';
         */
+       
+
         return $this->render('admin/admin.html.twig',array(
             'test' => 'test'
         ));
         //return new Response('<html><body>Admin page!</body></html>');
+    }
+
+    /**
+     * @Route("/product",name="product")
+     */
+    public function productAction()
+    {
+        $product = new Product();
+        $product->setName('Keyboard');
+        $product->setPrice(19.99);
+        $product->setDescription('Ergonomic and stylish!');
+
+        $em = $this->getDoctrine()->getManager();
+
+        // tells Doctrine you want to (eventually) save the Product (no queries yet)
+        $em->persist($product);
+
+        // actually executes the queries (i.e. the INSERT query)
+        $em->flush();
+
+        return new Response('Saved new product with id '.$product->getId());
+    }
+
+    /**
+     * @Route("/product/{product}")
+     */
+    public function showAction($product)
+    {
+        $productt = $this->getDoctrine()
+            ->getRepository('AppBundle:Product')
+            ->find($product);
+
+        if (!$productt) {
+            throw $this->createNotFoundException(
+                'No product found for id '.$product
+            );
+        }
+        return new Response(' product name '.$productt->getName());
+
+
+    }
+
+    /**
+     * @Route("/product/update/{productId}")
+     */
+    public function updateAction($productId)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $product = $em->getRepository('AppBundle:Product')->find($productId);
+
+        if (!$product) {
+            throw $this->createNotFoundException(
+                'No product found for id '.$productId
+            );
+        }
+
+        $product->setName('New product name!');
+        $em->flush();
+
+
+        return new Response(' product new name '.$product->getName());
+    }
+
+    /**
+     * @Route("/product/delete/{productId}")
+     */
+    public function deleteAction($productId)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $product = $em->getRepository('AppBundle:Product')->find($productId);
+
+        if (!$product) {
+            throw $this->createNotFoundException(
+                'No product found for id '.$productId
+            );
+        }
+
+
+        $em->remove($product);
+        $em->flush();
+
+
+
+        return new Response('Delete product id '.$productId);
     }
 
 }

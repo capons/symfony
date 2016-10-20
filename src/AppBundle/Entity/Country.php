@@ -10,7 +10,7 @@ use AppBundle\Entity\User;
 /**
  * User
  *
- * @ORM\Table(name="country")
+ * @ORM\Table(name="country",options={"collate"="utf8_general_ci"})
  * @ORM\Entity(repositoryClass="AppBundle\Repository\CountryRepository")
  */
 class Country

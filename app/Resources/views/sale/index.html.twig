@@ -1,0 +1,56 @@
+{% extends 'app.php.twig' %}
+
+{% block widget %}
+
+    <p>sales blog</p>
+
+    {% if category_form  %}
+        {{ form_start(category_form) }}
+        <div class="form-group">
+            {{ form_label(category_form.name) }}
+            {{ form_errors(category_form.name) }}
+            {{ form_widget(category_form.name) }}
+        </div>
+
+        <div class="form-group">
+            {{ form_label(category_form.cat) }}
+            {{ form_errors(category_form.cat) }}
+            {{ form_widget(category_form.cat) }}
+        </div>
+
+
+
+        <div class="form-group">
+
+            {{ form_widget(category_form.save) }}
+        </div>
+        {{ form_end(category_form) }}
+    {% endif %}
+    <!--form error message -->
+    {% if app.session.flashBag.has('success') %}
+        <div class="alert alert-success">
+            {% for msg in app.session.flashBag.get('success') %}
+                {{ msg }}
+            {% endfor %}
+        </div>
+    {% endif %}
+    {% if app.session.flashBag.has('error') %}
+        <div class="alert alert-warning">
+            {% for msg in app.session.flashBag.get('error') %}
+                {{ msg }}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+
+
+
+
+{% endblock %}
+
+{% block body %}
+
+
+
+
+{% endblock %}

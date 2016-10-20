@@ -1,10 +1,7 @@
 <?php
 namespace AppBundle\Entity;
-
 use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Security\Core\User\UserInterface;
-use AppBundle\Entity\Country;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Table;
 use Doctrine\ORM\Mapping\Id;
@@ -12,10 +9,11 @@ use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\GeneratedValue;
 
 /**
- * @ORM\Table(name="product",options={"collate"="utf8_general_ci"})
+ * @ORM\Table(options={"collate"="utf8_general_ci"})
  * @ORM\Entity
  */
-class Product
+
+class Address
 {
     /**
      * @ORM\Column(type="integer")
@@ -27,13 +25,10 @@ class Product
 
     /**
      * @ORM\Column(type="string", length=60)
-     * */
-    private $name;
-    /**
-     * @ORM\ManyToOne(targetEntity="Category", inversedBy="products")
-     * @ORM\JoinColumn(name="category_id", referencedColumnName="id")
+
      */
-    private $category;
+    private $address;
+
 
     /**
      * Get id
@@ -46,26 +41,24 @@ class Product
     }
 
     /**
-     * Set category
+     * Set address
      *
-     * @param \AppBundle\Entity\Category $category
-     *
-     * @return Product
+
      */
-    public function setCategory(\AppBundle\Entity\Category $category = null)
+    public function setAddress($address)
     {
-        $this->category = $category;
+        $this->address = $address;
 
         return $this;
     }
 
     /**
-     * Get category
+     * Get address
      *
-     * @return \AppBundle\Entity\Category
+     * @return string
      */
-    public function getCategory()
+    public function getAddress()
     {
-        return $this->category;
+        return $this->address;
     }
 }

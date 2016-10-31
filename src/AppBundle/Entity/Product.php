@@ -35,7 +35,7 @@ class Product
      */
     public $category;
 
-    //variable to retrive category name from form guilder in SaleController
+    //variable to retrive category name from form builder in SaleController
     public $cat;
 
     /**

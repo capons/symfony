@@ -1,0 +1,67 @@
+{% extends 'app.php.twig' %}
+
+{% block widget %}
+
+
+
+
+    {% if reg_form  %}
+        {{ form_start(reg_form) }}
+        <div class="form-group">
+            {{ form_label(reg_form.username) }}
+            {{ form_errors(reg_form.username) }}
+            {{ form_widget(reg_form.username) }}
+        </div>
+        <div class="form-group">
+            {{ form_label(reg_form.address) }}
+            {{ form_errors(reg_form.address) }}
+            {{ form_widget(reg_form.address) }}
+        </div>
+        <div class="form-group">
+            {{ form_label(reg_form.email) }}
+            {{ form_errors(reg_form.email) }}
+            {{ form_widget(reg_form.email) }}
+        </div>
+        <div class="form-group">
+            {{ form_label(reg_form.country) }}
+            {{ form_errors(reg_form.country) }}
+            {{ form_widget(reg_form.country) }}
+        </div>
+        <div class="form-group">
+            {{ form_label(reg_form.password) }}
+            {{ form_errors(reg_form.password) }}
+            {{ form_widget(reg_form.password) }}
+        </div>
+        <div class="form-group">
+
+            {{ form_widget(reg_form.save) }}
+        </div>
+        {{ form_end(reg_form) }}
+    {% endif %}
+    <!--form  message -->
+    {% if app.session.flashBag.has('success') %}
+        <div class="alert alert-success">
+            {% for msg in app.session.flashBag.get('success') %}
+                {{ msg }}
+            {% endfor %}
+        </div>
+    {% endif %}
+    <!--form error message -->
+    {% if app.session.flashBag.has('error') %}
+        <div class="alert alert-warning">
+            {% for msg in app.session.flashBag.get('error') %}
+                {{ msg }}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+
+
+{% endblock %}
+
+{% block body %}
+
+
+
+
+{% endblock %}

@@ -28,7 +28,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 class SaleController extends  Controller
 {
     /**
-     * @Route("/sale", name="_sale")
+     * @Route("/product", name="_sale")
      */
     public function indexAction (Request $request)
     {
@@ -103,28 +103,86 @@ class SaleController extends  Controller
 
             return $this->redirectToRoute('_sale');
         } else {
+            //display all product
+            $product = $this->getDoctrine()
+                ->getRepository('AppBundle:Product')
+                ->createQueryBuilder('e')
+                ->select('e.id,e.name, co.name as cat_name')
+                ->leftJoin('AppBundle:Category', 'co', 'WITH', 'co.id = e.category')
+                ->getQuery()
+                ->getResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
+
             return $this->render('sale/index.html.twig', array(
                 'category_form' => $form->createView(),
-                'errors' => ''
+                'errors' => '',
+                'product' => $product
             ));
         }
     }
 
     /**
-     * @Route("/sale/{productId}")
+     * @Route("/product/{productId}",  requirements={"productId" = "\d+"}, defaults={"productId" = null}, name="_product_detailes")
      */
     public function detaileAction($productId)
     {
+
         $product = $this->getDoctrine()
             ->getRepository('AppBundle:Product')
             //->find($productId);
-            ->findAll();
-
-
-        //$categoryName = $product->getCategory()->getName();
+            ->createQueryBuilder('e')
+            ->select('e.id,e.name, co.name as cat_name')
+            ->leftJoin('AppBundle:Category', 'co', 'WITH', 'co.id = e.category')
+            ->where('e.id = :id')
+            ->setParameter('id', $productId)
+            ->getQuery()
+            ->getResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
 
         return $this->render('sale/details.html.twig', array(
             'product' => $product
         ));
+    }
+
+    /**
+     * @Route("/product/update/{productId}")
+     */
+    public function updateAction($productId)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $product = $em->getRepository('AppBundle:Product')->find($productId);
+
+        if (!$product) {
+            throw $this->createNotFoundException(
+                'No product found for id '.$productId
+            );
+        }
+
+        $product->setName('New product name!');
+        $em->flush();
+
+
+        return new Response(' product new name '.$product->getName());
+    }
+
+    /**
+     * @Route("/product/delete/{productId}")
+     */
+    public function deleteAction($productId)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $product = $em->getRepository('AppBundle:Product')->find($productId);
+
+        if (!$product) {
+            throw $this->createNotFoundException(
+                'No product found for id '.$productId
+            );
+        }
+
+
+        $em->remove($product);
+        $em->flush();
+
+
+
+        return new Response('Delete product id '.$productId);
     }
 }

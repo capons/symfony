@@ -10,6 +10,7 @@ use Doctrine\ORM\Mapping\Table;
 use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\GeneratedValue;
+use Doctrine\Common\Collections\ArrayCollection;
 
 
 
@@ -21,60 +22,92 @@ use Doctrine\ORM\Mapping\GeneratedValue;
  */
 class User implements UserInterface, \Serializable
 {
+
+    public function __construct()
+    {
+        //set default Entity variable
+        $this->isActive = true;
+        $this->roles = 'ROLE_USER'; //default role
+
+    }
+
+
     /**
      * @ORM\Column(type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      *
      */
-    private $id;
+    public $id;
 
     /**
      * @ORM\Column(type="string", length=25)
      * @Assert\NotNull(message="You have to choose a username (this is my custom validation message).")
+     *  @Assert\Regex(
+     *     pattern="/\d/",
+     *     match=false,
+     *     message="Your name cannot contain a number"
+     * )
      */
     private $username;
 
     /**
      * @ORM\Column(type="string", length=64)
+     * @Assert\NotNull(message="Password error (this is my custom validation message).")
+     * @Assert\Length(
+     *      min = 2,
+     *      max = 50,
+     *      minMessage = "Your password must be at least {{ limit }} characters long",
+     *      maxMessage = "Your password cannot be longer than {{ limit }} characters"
+     * )
      */
     private $password;
 
     /**
      * @ORM\Column(type="string", length=64)
      */
-    private $roles =array();
+    private $roles;
 
     /**
      * @ORM\Column(type="string", length=60)
+     * @Assert\NotNull(message="Please enter email address")
+     * @Assert\Email(message = "The email '{{ value }}' is not a valid email.", checkMX = true )
+     * @Assert\Length(
+     *      min = 2,
+     *      max = 50,
+     *      minMessage = "Your password must be at least {{ limit }} characters long",
+     *      maxMessage = "Your password cannot be longer than {{ limit }} characters"
+     * )
      */
     private $email;
 
-    /**
-     * @ORM\Column(type="integer", length=60)
-     *
-     */
-    private $country;
+
 
     /**
      *
      * @ORM\Column(type="string", length=60)
+     *
+     *
      */
     private $address;
-
-
 
     /**
      * @ORM\Column(name="is_active", type="boolean")
      */
     private $isActive;
 
-    public function __construct()
-    {
-        $this->isActive = true;
-        // may not be needed, see section on salt below
-        // $this->salt = md5(uniqid(null, true));
-    }
+    /**
+     * @ORM\ManyToOne(targetEntity="Country", inversedBy="user")
+     * @ORM\JoinColumn(name="category_id", referencedColumnName="id")
+     */
+    private $country;
+
+
+
+
+
+
+
 
     public function getUsername()
     {
@@ -130,24 +163,15 @@ class User implements UserInterface, \Serializable
         return $this->email;
     }
 
-    //country field get set method
-    public function getCountry()
-    {
-        return $this->country;
-    }
-    public function SetCountry($country)
-    {
-        $this->country = $country;
-        return $this->country;
-    }
-
 
 
     public function eraseCredentials()
     {
     }
 
+
     /** @see \Serializable::serialize() */
+
     public function serialize()
     {
         return serialize(array(
@@ -159,7 +183,9 @@ class User implements UserInterface, \Serializable
         ));
     }
 
+
     /** @see \Serializable::unserialize() */
+
     public function unserialize($serialized)
     {
         list (
@@ -172,6 +198,23 @@ class User implements UserInterface, \Serializable
     }
 
 
+   
+    public function setAddress($address)
+    {
+        $this->address = $address;
+
+        return $this;
+    }
+
+    /**
+     * Get address
+     *
+     * @return string
+     */
+    public function getAddress()
+    {
+        return $this->address;
+    }
 
     /**
      * Set isActive
@@ -197,27 +240,6 @@ class User implements UserInterface, \Serializable
         return $this->isActive;
     }
 
-    /**
-     * Set address
-     *
-     *
-     *
-     * @return User
-     */
-    public function setAddress($address)
-    {
-        $this->address = $address;
 
-        return $this;
-    }
 
-    /**
-     * Get address
-     *
-     * @return \AppBundle\Entity\Address
-     */
-    public function getAddress()
-    {
-        return $this->address;
-    }
 }

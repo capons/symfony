@@ -27,20 +27,22 @@
         {{ form_end(category_form) }}
     {% endif %}
     <!--form error message -->
-    {% if app.session.flashBag.has('success') %}
-        <div class="alert alert-success">
-            {% for msg in app.session.flashBag.get('success') %}
-                {{ msg }}
-            {% endfor %}
-        </div>
+    {% if app.session.flashBag.has('product_notice') %}
+            <div class="alert alert-success">
+                {% for flash_message in app.session.flashBag.get('product_notice') %}
+                    {{ flash_message }}
+                {% endfor %}
+            </div>
     {% endif %}
-    {% if app.session.flashBag.has('error') %}
+    {% if app.session.flashBag.has('product_error') %}
         <div class="alert alert-warning">
-            {% for msg in app.session.flashBag.get('error') %}
+            {% for msg in app.session.flashBag.get('product_error') %}
                 {{ msg }}
             {% endfor %}
         </div>
     {% endif %}
+
+
 
 
 
@@ -50,10 +52,33 @@
 
 {% block body %}
     <div class="col-lg-12">
+
         {% for item in product %}
             <div style="margin: 0 auto;float: none" class="col-xs-6">
                 <div style="padding: 10px; background-color: cornflowerblue; color: ghostwhite;margin-bottom: 5px" class="col-xs-12">
-                    <a style="color:white" href="{{ path('_product_detailes',{'productId': item.id}) }}">{{ item.name }}</a>
+                    <div  class="col-xs-8">
+                        <div style="margin-top: 5px;" class="col-xs-4">
+                            <a style="color:white" href="{{ path('_product_detailes',{'productId': item.id}) }}">{{ loop.index }} click to detailes</a>
+                        </div>
+                        <div class="col-xs-8">
+                            <form method="POST" action="{{ path('_product_update')}}">
+                                <input style="background-color: #1E1E1E;border: none" name="product_name" value="{{ item.name }}">
+                                <input type="hidden" name="product_id" value="{{ item.id }}">
+                                <input type="submit" class="btn btn-danger" value="Update">
+                            </form>
+                        </div>
+
+                    </div>
+                    <div class="col-xs-4">
+
+                        <form method="POST" action="{{ path('_product_delete')}}">
+                            <input type="hidden" name="product_id" value="{{ item.id }}">
+                            <input type="submit" class="btn btn-danger" value="Delete">
+                        </form>
+                        <!--
+                        <a class="btn btn-danger" href="{{ path('_product_delete',{'productId': item.id}) }}">Delete</a>
+                        -->
+                    </div>
                 </div>
             </div>
         {% endfor %}

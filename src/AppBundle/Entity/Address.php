@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping\Table;
 use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\GeneratedValue;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * @ORM\Table(options={"collate"="utf8_general_ci"})
@@ -15,6 +16,22 @@ use Doctrine\ORM\Mapping\GeneratedValue;
 
 class Address
 {
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->users = new ArrayCollection();
+    }
+
+    /**
+     * @return mixed
+     */
+    public function __toString() {
+        //if variable return in formbuilder in EntityType::class for example
+        return $this->address;
+    }
+
     /**
      * @ORM\Column(type="integer")
      * @ORM\Id
@@ -30,6 +47,7 @@ class Address
     private $address;
 
 
+
     /**
      * Get id
      *
@@ -43,7 +61,9 @@ class Address
     /**
      * Set address
      *
-
+     * @param string $address
+     *
+     * @return Address
      */
     public function setAddress($address)
     {
@@ -61,4 +81,6 @@ class Address
     {
         return $this->address;
     }
+
+   
 }

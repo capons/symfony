@@ -6,6 +6,7 @@ use AppBundle\Entity\Address;
 use AppBundle\Entity\Category;
 use AppBundle\Entity\Country;
 use AppBundle\Entity\Product;
+use AppBundle\Repository\ProductRepository;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -24,16 +25,23 @@ use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
+use AppBundle\Form\Type\ProductType;
+
+
 
 class SaleController extends  Controller
 {
+
     /**
      * @Route("/product", name="_sale")
      */
     public function indexAction (Request $request)
     {
+        //check user access; (only 'ROLE_USER' can access)
+
         $authorizationChecker = $this->get('security.authorization_checker');
         // check for auth user access
+
         if (false === $authorizationChecker->isGranted('ROLE_USER')) {
             //throw new AccessDeniedException();
             $request->getSession()
@@ -43,56 +51,29 @@ class SaleController extends  Controller
             return $this->redirectToRoute('_homepage');
         }
         //check if user login
-        $securityContext = $this->container->get('security.authorization_checker');
-        if ($securityContext->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+        //get login user data if need
+        if ($authorizationChecker->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+            //user data
             $user = $this->getUser();
-            // echo $user->getId();
+
+           // var_dump($user);
+           //  echo $user->getId();
+           // var_dump($user);
         }
         $category = new Category();
         $product = new Product();
 
-        $form = $this->createFormBuilder($product)
-
-            ->add('name', TextType::class,array(
-                'required' => true,
-                'label' => 'Add product',
-                'attr' => array(
-                    'maxlength' => 20,
-                    'value' => 'new product',
-                    'class' => 'form-control'
-                )
-            ))
-            ->add('cat', TextType::class,array(
-                'required' => true,
-                'label' => 'Add category',
-                'attr' => array(
-                    'maxlength' => 20,
-                    'value' => 'new category',
-                    'class' => 'form-control'
-                )
-            ))
-
-
-
-            ->add('save', SubmitType::class, array('label' => 'Create Category'))
-            ->getForm();
+        $form = $this->createForm(ProductType::class, $product); // ProductType form builder class
         $form->handleRequest($request);
         $validator = $this->get('validator');
         $errors = $validator->validate($product);
-        //create category
+        //create category if form validate
         if ($form->isSubmitted() && $form->isValid()) {
 
             $category -> setName($form["cat"]->getData());
-
             $product->setName($form["name"]->getData());
-
-
-            //$product->setName('test');
-
-
             // relate this product to the category
             $product->setCategory($category);
-
             $em = $this->getDoctrine()->getManager();
             $em->persist($category);
             $em->persist($product);
@@ -104,18 +85,14 @@ class SaleController extends  Controller
             return $this->redirectToRoute('_sale');
         } else {
             //display all product
-            $product = $this->getDoctrine()
-                ->getRepository('AppBundle:Product')
-                ->createQueryBuilder('e')
-                ->select('e.id,e.name, co.name as cat_name')
-                ->leftJoin('AppBundle:Category', 'co', 'WITH', 'co.id = e.category')
-                ->getQuery()
-                ->getResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
-
+            $em = $this->getDoctrine()->getManager();
+            $products = $em->getRepository('AppBundle:Product')
+                ->findAllProduct(); //my custom repository
+           // $product = $product->loadAllProduct();
             return $this->render('sale/index.html.twig', array(
                 'category_form' => $form->createView(),
                 'errors' => '',
-                'product' => $product
+                'product' => $products
             ));
         }
     }
@@ -126,63 +103,82 @@ class SaleController extends  Controller
     public function detaileAction($productId)
     {
 
-        $product = $this->getDoctrine()
-            ->getRepository('AppBundle:Product')
-            //->find($productId);
-            ->createQueryBuilder('e')
-            ->select('e.id,e.name, co.name as cat_name')
-            ->leftJoin('AppBundle:Category', 'co', 'WITH', 'co.id = e.category')
-            ->where('e.id = :id')
-            ->setParameter('id', $productId)
-            ->getQuery()
-            ->getResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
-
+        $em = $this->getDoctrine()->getManager();
+        $products = $em->getRepository('AppBundle:Product')
+            ->findByProductId($productId); //my custom repository
         return $this->render('sale/details.html.twig', array(
-            'product' => $product
+            'product' => $products
         ));
     }
 
     /**
-     * @Route("/product/update/{productId}")
+     * @Route("/product/update", name="_product_update")
      */
-    public function updateAction($productId)
+    public function updateAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
-        $product = $em->getRepository('AppBundle:Product')->find($productId);
+        if ($request->getMethod() == 'POST') {
+            $productId = $request->request->get('product_id');
+            $new_name = $request->request->get('product_name');
+            if(empty($new_name)){
+                $this->addFlash(
+                    'product_error',
+                    'Product need name!'
+                );
+                return $this->redirectToRoute('_sale');
+            }
+            $em = $this->getDoctrine()->getManager();
+            $product = $em->getRepository('AppBundle:Product')->find($productId);
 
-        if (!$product) {
-            throw $this->createNotFoundException(
-                'No product found for id '.$productId
+            if (!$product) {
+                $this->addFlash(
+                    'product_error',
+                    'Product not found!'
+                );
+                return $this->redirectToRoute('_sale');
+            }
+
+            $product->setName($new_name);
+            $em->flush();
+
+            $this->addFlash(
+                'product_notice',
+                'Product successfully update!'
             );
+            return $this->redirectToRoute('_sale');
+
+        } else {
+            return $this->redirectToRoute('_sale');
         }
-
-        $product->setName('New product name!');
-        $em->flush();
-
-
-        return new Response(' product new name '.$product->getName());
     }
 
     /**
-     * @Route("/product/delete/{productId}")
+     * @Route("/product/delete", name="_product_delete")
      */
-    public function deleteAction($productId)
+    public function deleteAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
-        $product = $em->getRepository('AppBundle:Product')->find($productId);
+        if ($request->getMethod() == 'POST') {
+            $productId = $request->request->get('product_id');
+            $em = $this->getDoctrine()->getManager();
+            $product = $em->getRepository('AppBundle:Product')->find($productId);
 
-        if (!$product) {
-            throw $this->createNotFoundException(
-                'No product found for id '.$productId
+            if (!$product) {
+                $this->addFlash(
+                    'product_error',
+                    'Product not found!'
+                );
+                return $this->redirectToRoute('_sale');
+
+            }
+            $this->addFlash(
+                'product_notice',
+                'Product successfully deleted!'
             );
+            $em->remove($product);
+            $em->flush();
+            return $this->redirectToRoute('_sale');
+            // Need to do something with the data here
+        } else {
+            return $this->redirectToRoute('_sale');
         }
-
-
-        $em->remove($product);
-        $em->flush();
-
-
-
-        return new Response('Delete product id '.$productId);
     }
 }

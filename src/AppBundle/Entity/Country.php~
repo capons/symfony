@@ -5,22 +5,32 @@ namespace AppBundle\Entity;
 use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
-use AppBundle\Entity\User;
+use AppBundle\Entity\Users;
 
 /**
- * User
+ * Country
  *
  * @ORM\Table(name="country",options={"collate"="utf8_general_ci"})
  * @ORM\Entity(repositoryClass="AppBundle\Repository\CountryRepository")
  */
 class Country
 {
+
+
+    /**
+     * @return mixed
+     */
+    public function __toString() {
+        //if variable return in formbuilder in EntityType::class for example
+        return $this->name;
+    }
+
     /**
      * @ORM\Column(type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
+    public $id;
 
 
 
@@ -34,6 +44,8 @@ class Country
      * @ORM\Column(type="string", length=10)
      */
     private $code;
+
+
 
 
 
@@ -76,5 +88,46 @@ class Country
         $this->code = $code;
 
         return $this;
+    }
+
+
+
+
+
+
+
+
+    /**
+     * Add user
+     *
+     * @param \AppBundle\Entity\User $user
+     *
+     * @return Country
+     */
+    public function addUser(\AppBundle\Entity\User $user)
+    {
+        $this->users[] = $user;
+
+        return $this;
+    }
+
+    /**
+     * Remove user
+     *
+     * @param \AppBundle\Entity\User $user
+     */
+    public function removeUser(\AppBundle\Entity\User $user)
+    {
+        $this->users->removeElement($user);
+    }
+
+    /**
+     * Get users
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getUsers()
+    {
+        return $this->users;
     }
 }

@@ -10,10 +10,11 @@ use Doctrine\ORM\Mapping\Table;
 use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\GeneratedValue;
+use Doctrine\ORM\Mapping\ClassMetadata;
 
 /**
  * @ORM\Table(name="product",options={"collate"="utf8_general_ci"})
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="AppBundle\Repository\ProductRepository")
  */
 class Product
 {
@@ -33,7 +34,10 @@ class Product
      * @ORM\ManyToOne(targetEntity="Category", inversedBy="products")
      * @ORM\JoinColumn(name="category_id", referencedColumnName="id")
      */
-    private $category;
+    public $category;
+
+    //variable to retrive category name from form builder in SaleController
+    public $cat;
 
     /**
      * Get id
@@ -67,5 +71,38 @@ class Product
     public function getCategory()
     {
         return $this->category;
+    }
+
+    /**
+     * Set name
+     *
+     * @param string $name
+     *
+     * @return Product
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * Get name
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    public function getCat()
+    {
+        return $this->cat;
+    }
+    public function setCat($cat)
+    {
+        return $this->cat = $cat;
     }
 }

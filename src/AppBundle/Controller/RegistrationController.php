@@ -9,9 +9,11 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use AppBundle\Entity\User;
+use AppBundle\Form\Type\UserType;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+
 
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
@@ -21,6 +23,7 @@ use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 
 class RegistrationController extends Controller{
 
@@ -33,65 +36,22 @@ class RegistrationController extends Controller{
         //$request->query->get('id'); retrive post get data example
         $user = new User();
         $address = new Address();
-        $em = $this->getDoctrine()->getManager();
-        $query = $em->createQuery(
-            'SELECT p.id,p.code,p.name
-                 FROM AppBundle:Country p'
-        );
-        $all_country = $query->getResult();
-        $sort_country = array();
-        foreach ($all_country as $val){
-            $sort_country[$val['name']] = $val['id'];
-        }
+
+
         //create form
-        $form = $this->createFormBuilder($user)
 
-            ->add('username', TextType::class,array(
-                'required' => true,
-                'attr' => array(
-                    'maxlength' => 4,
-                    'value' => 'bog',
-                    'class' => 'form-control'
-                )
-            ))
+        $form = $this->createForm(UserType::class, $user); // UserType form builder class
 
-            ->add('address', TextType::class,array(
-                'required' => true,
-                'attr' => array(
-                    'maxlength' => 40,
-                    'value' => 'some address',
-                    'class' => 'form-control'
-                )
-            ))
 
-            ->add('email', EmailType::class,array(
-                'required' => true,
-                'attr' => array(
-                    'maxlength' => 30,
-                    'value' => 'someemail@ram.ru',
-                    'class' => 'form-control'
-                )
-            ))
-            ->add('country', ChoiceType::class, array(
-                'choices' => $sort_country//$country
-
-            ))
-            ->add('password', PasswordType::class,array(
-                'required' => true,
-                'attr' => array(
-                    'maxlength' => 20,
-                    'value' => '111111',
-                    'class' => 'form-control'
-                )
-            ))
-            ->add('save', SubmitType::class, array('label' => 'Create Task'))
-            ->getForm();
         $form->handleRequest($request);
+        //validate form
+
         $validator = $this->get('validator');
         $errors = $validator->validate($user);
 
-
+        //if form submit
         if ($form->isSubmitted() && $form->isValid()) {
+
 
             $repository = $this->getDoctrine()->getRepository('AppBundle:User');
 
@@ -103,7 +63,7 @@ class RegistrationController extends Controller{
                     ->getFlashBag()
                     ->add('error', 'Username already exist!')
                 ;
-                $url = $this->generateUrl('_homepage');
+                $url = $this->generateUrl('_registration');
                 return $this->redirect($url);
             }
             $check_duplicat_email = $repository->findOneByEmail($form["email"]->getData());
@@ -117,22 +77,25 @@ class RegistrationController extends Controller{
                 return $this->redirect($url);
             }
             //save form data to database
+            //save address
+
             $em = $this->getDoctrine()->getManager();
             $address->setAddress($form["address"]->getData());
             $em->persist($address);
             $em->flush();
             $address_id = $address->getId(); //return save address id
 
+            //user object
             $user = $form->getData();
-
             $pwd=$user->getPassword();
             $encoder=$this->container->get('security.password_encoder');
             $pwd=$encoder->encodePassword($user, $pwd);
             $user->setPassword($pwd);
-            $user->setRoles('ROLE_USER'); //default role
+
             $user->setAddress($address_id);
 
             $em->persist($user);
+
             $em->flush();
             $request->getSession()
                 ->getFlashBag()
@@ -142,8 +105,11 @@ class RegistrationController extends Controller{
 
         } else {
 
-            //load view with parameter
 
+
+
+
+            //load view with parameter
             return $this->render('registration/index.html.twig', array(
                 'reg_form' => $form->createView(),
                 'errors' => $errors

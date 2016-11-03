@@ -28,6 +28,7 @@ class UserType extends AbstractType
 
             ->add('username', TextType::class,array(
                 'required' => true,
+                'label' => 'Login',
                 'attr' => array(
                     'maxlength' => 4,
                     'value' => 'bog',
@@ -35,8 +36,9 @@ class UserType extends AbstractType
                 )
             ))
 
-            ->add('address', TextType::class,array(
+            ->add('addre', TextType::class,array(
                 'required' => true,
+                'label' => 'Address',
                 'attr' => array(
                     'maxlength' => 40,
                     'value' => 'some address',
@@ -58,8 +60,6 @@ class UserType extends AbstractType
                 'choice_label' => 'name',
 
             ))
-
-
 
 
             ->add('password', PasswordType::class,array(

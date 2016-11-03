@@ -50,13 +50,15 @@ class SaleController extends  Controller
             ;
             return $this->redirectToRoute('_homepage');
         }
+
         //check if user login
         //get login user data if need
         if ($authorizationChecker->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
             //user data
-            $user = $this->getUser();
-
-           // var_dump($user);
+            //all user data
+            //$user = $this->getUser();
+            //relation field user data
+            //var_dump($user->getAddress()->getAddress());
            //  echo $user->getId();
            // var_dump($user);
         }
@@ -68,6 +70,9 @@ class SaleController extends  Controller
         $validator = $this->get('validator');
         $errors = $validator->validate($product);
         //create category if form validate
+
+
+
         if ($form->isSubmitted() && $form->isValid()) {
 
             $category -> setName($form["cat"]->getData());
@@ -117,8 +122,19 @@ class SaleController extends  Controller
     public function updateAction(Request $request)
     {
         if ($request->getMethod() == 'POST') {
+
+
             $productId = $request->request->get('product_id');
             $new_name = $request->request->get('product_name');
+            //validate update data
+            $new_name = trim(strip_tags($new_name));
+            if(strlen($new_name) > 40){
+                $this->addFlash(
+                    'product_error',
+                    'Product name is too long!'
+                );
+                return $this->redirectToRoute('_sale');
+            }
             if(empty($new_name)){
                 $this->addFlash(
                     'product_error',
@@ -144,7 +160,9 @@ class SaleController extends  Controller
                 'product_notice',
                 'Product successfully update!'
             );
+
             return $this->redirectToRoute('_sale');
+
 
         } else {
             return $this->redirectToRoute('_sale');

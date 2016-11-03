@@ -11,6 +11,8 @@ use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\GeneratedValue;
 use Doctrine\Common\Collections\ArrayCollection;
+use AppBundle\Entity\Address;
+use Symfony\Component\Security\Core\User\AdvancedUserInterface;
 
 
 
@@ -20,14 +22,15 @@ use Doctrine\Common\Collections\ArrayCollection;
  * @ORM\Table(name="user",options={"collate"="utf8_general_ci"})
  * @ORM\Entity(repositoryClass="AppBundle\Repository\UserRepository")
  */
-class User implements UserInterface, \Serializable
+class User implements  AdvancedUserInterface , \Serializable
 {
 
     public function __construct()
     {
         //set default Entity variable
         $this->isActive = true;
-        $this->roles = 'ROLE_USER'; //default role
+        //for user permission gtoup;
+        $this->groups = new ArrayCollection();
 
     }
 
@@ -63,10 +66,13 @@ class User implements UserInterface, \Serializable
      */
     private $password;
 
+
+    //user permission group
     /**
-     * @ORM\Column(type="string", length=64)
+     * @ORM\ManyToMany(targetEntity="Group", inversedBy="users")
+     *
      */
-    private $roles;
+    private $groups;
 
     /**
      * @ORM\Column(type="string", length=60)
@@ -82,14 +88,24 @@ class User implements UserInterface, \Serializable
     private $email;
 
 
-
+    //related with entity Address
     /**
-     *
-     * @ORM\Column(type="string", length=60)
-     *
+     * @ORM\ManyToOne(targetEntity="Address", inversedBy="user")
+     * @ORM\JoinColumn(name="address_id", referencedColumnName="id")
      *
      */
     private $address;
+
+    //variable to get address
+    /**
+     * @Assert\Length(
+     *      min = 2,
+     *      max = 50,
+     *      minMessage = "Your password must be at least {{ limit }} characters long",
+     *      maxMessage = "Your password cannot be longer than {{ limit }} characters"
+     * )
+     */
+    private $addre;
 
     /**
      * @ORM\Column(name="is_active", type="boolean")
@@ -99,69 +115,33 @@ class User implements UserInterface, \Serializable
     //related with entity Country
     /**
      * @ORM\ManyToOne(targetEntity="Country", inversedBy="user")
-     * @ORM\JoinColumn(name="category_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="country_id", referencedColumnName="id")
      */
     private $country;
 
 
-    public function getUsername()
-    {
-        return $this->username;
-    }
-
-    public function setUsername($username)
-    {
-        $this->username = $username;
-        return $this->username;
-    }
-
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    public function getSalt()
-    {
-        // you *may* need a real salt depending on your encoder
-        // see section on salt below
-        return null;
-    }
-
-    public function getPassword()
-    {
-        return $this->password;
-    }
-
-    public function setPassword($password)
-    {
-        $this->password = $password;
-        return $this->password;
-    }
-
-    public function getRoles()
-    {
-        return array($this->roles);
-    }
-    public function setRoles($role)
-    {
-        $this->roles = $role;
-        return $this->roles;
-    }
-    //email field get set method
-    public function getEmail()
-    {
-        return $this->email;
-    }
-    public function SetEmail($email)
-    {
-        $this->email = $email;
-        return $this->email;
-    }
-
-
-
     public function eraseCredentials()
     {
+    }
+    //if return false -> user set permission with zero access
+    public function isAccountNonExpired()
+    {
+        return true;
+    }
+
+    public function isAccountNonLocked()
+    {
+        return true;
+    }
+
+    public function isCredentialsNonExpired()
+    {
+        return true;
+    }
+
+    public function isEnabled()
+    {
+        return $this->isActive;
     }
 
 
@@ -193,23 +173,108 @@ class User implements UserInterface, \Serializable
     }
 
 
-   
-    public function setAddress($address)
+    /**
+     * @param $roles
+     * @return string
+     */
+
+    public function setRoles($roles)
     {
-        $this->address = $address;
+      //  $this->roles = $roles;
+      //  return $this->roles;
+    }
+
+    /**
+     * @return array
+     */
+
+    public function getRoles()
+    {
+       // return array($this->roles);
+        return $this->groups->toArray();
+    }
+
+    /**
+     * @return null
+     */
+    public function getSalt()
+    {
+        // you *may* need a real salt depending on your encoder
+        // see section on salt below
+        return null;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPassword()
+    {
+        return $this->password;
+    }
+
+    /**
+     * @param $password
+     * @return mixed
+     */
+    public function setPassword($password)
+    {
+        $this->password = $password;
+        return $this->password;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getUsername()
+    {
+        return $this->username;
+    }
+
+    /**
+     * @param $username
+     * @return mixed
+     */
+    public function setUsername($username)
+    {
+        $this->username = $username;
+        return $this->username;
+    }
+
+    /**
+     * Get id
+     *
+     * @return integer
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * Set email
+     *
+     * @param string $email
+     *
+     * @return User
+     */
+    public function setEmail($email)
+    {
+        $this->email = $email;
 
         return $this;
     }
 
     /**
-     * Get address
+     * Get email
      *
      * @return string
      */
-    public function getAddress()
+    public function getEmail()
     {
-        return $this->address;
+        return $this->email;
     }
+
+    
 
     /**
      * Set isActive
@@ -235,8 +300,33 @@ class User implements UserInterface, \Serializable
         return $this->isActive;
     }
 
+ 
 
+    
 
+    /**
+     * Set address
+     *
+     * @param \AppBundle\Entity\Address $address
+     *
+     * @return User
+     */
+    public function setAddress(\AppBundle\Entity\Address $address = null)
+    {
+        $this->address = $address;
+
+        return $this;
+    }
+
+    /**
+     * Get address
+     *
+     * @return \AppBundle\Entity\Address
+     */
+    public function getAddress()
+    {
+        return $this->address;
+    }
 
     /**
      * Set country
@@ -260,5 +350,60 @@ class User implements UserInterface, \Serializable
     public function getCountry()
     {
         return $this->country;
+    }
+
+    /**
+     * @return mixed
+     * get user address
+     */
+    public function getAddre()
+    {
+        return $this->addre;
+    }
+
+    /**
+     * @param $address
+     * @return mixed
+     * set user address
+     */
+    public function setAddre($address)
+    {
+        return $this->addre = $address;
+    }
+
+
+
+    /**
+     * Add group
+     *
+     * @param \AppBundle\Entity\Group $group
+     *
+     * @return User
+     */
+    public function addGroup(\AppBundle\Entity\Group $group)
+    {
+        $this->groups[] = $group;
+
+        return $this;
+    }
+
+    /**
+     * Remove group
+     *
+     * @param \AppBundle\Entity\Group $group
+     */
+    public function removeGroup(\AppBundle\Entity\Group $group)
+    {
+        $this->groups->removeElement($group);
+    }
+
+    /**
+     * Get groups
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getGroups()
+    {
+        return $this->groups;
     }
 }

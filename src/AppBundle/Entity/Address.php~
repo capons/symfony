@@ -16,20 +16,14 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 class Address
 {
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        $this->users = new ArrayCollection();
-    }
+    
 
     /**
      * @return mixed
      */
     public function __toString() {
         //if variable return in formbuilder in EntityType::class for example
-        return $this->address;
+       // return $this->address;
     }
 
     /**
@@ -42,9 +36,15 @@ class Address
 
     /**
      * @ORM\Column(type="string", length=60)
-
      */
     private $address;
+
+
+    /**
+     * @ORM\OneToMany(targetEntity="User", mappedBy="address")
+     */
+    public $users;
+
 
 
 
@@ -82,5 +82,47 @@ class Address
         return $this->address;
     }
 
-   
+
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->users = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    /**
+     * Add user
+     *
+     * @param \AppBundle\Entity\User $user
+     *
+     * @return Address
+     */
+    public function addUser(\AppBundle\Entity\User $user)
+    {
+        $this->users[] = $user;
+
+        return $this;
+    }
+
+    /**
+     * Remove user
+     *
+     * @param \AppBundle\Entity\User $user
+     */
+    public function removeUser(\AppBundle\Entity\User $user)
+    {
+        $this->users->removeElement($user);
+    }
+
+    /**
+     * Get users
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getUsers()
+    {
+        return $this->users;
+    }
 }

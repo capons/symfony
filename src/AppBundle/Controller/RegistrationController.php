@@ -10,6 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use AppBundle\Entity\User;
 use AppBundle\Form\Type\UserType;
+use AppBundle\Entity\Group;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
@@ -36,6 +37,8 @@ class RegistrationController extends Controller{
         //$request->query->get('id'); retrive post get data example
         $user = new User();
         $address = new Address();
+        $user_permission = new Group();
+
 
 
         //create form
@@ -46,12 +49,13 @@ class RegistrationController extends Controller{
         $form->handleRequest($request);
         //validate form
 
+
         $validator = $this->get('validator');
+
         $errors = $validator->validate($user);
 
         //if form submit
         if ($form->isSubmitted() && $form->isValid()) {
-
 
             $repository = $this->getDoctrine()->getRepository('AppBundle:User');
 
@@ -77,24 +81,19 @@ class RegistrationController extends Controller{
                 return $this->redirect($url);
             }
             //save form data to database
-            //save address
-
-            $em = $this->getDoctrine()->getManager();
-            $address->setAddress($form["address"]->getData());
-            $em->persist($address);
-            $em->flush();
-            $address_id = $address->getId(); //return save address id
-
-            //user object
-            $user = $form->getData();
+            $address->setAddress($form["addre"]->getData());
             $pwd=$user->getPassword();
             $encoder=$this->container->get('security.password_encoder');
             $pwd=$encoder->encodePassword($user, $pwd);
             $user->setPassword($pwd);
-
-            $user->setAddress($address_id);
-
+            $user->setAddress($address);
+            //add user permission
+            $user_permission->setName($form["username"]->getData());
+            $user->addGroup($user_permission);
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($address);
             $em->persist($user);
+            $em->persist($user_permission);
 
             $em->flush();
             $request->getSession()
@@ -104,6 +103,7 @@ class RegistrationController extends Controller{
             return $this->redirectToRoute('_registration');
 
         } else {
+
 
 
 

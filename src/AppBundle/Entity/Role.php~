@@ -1,57 +1,48 @@
 <?php
+
 namespace AppBundle\Entity;
-use Symfony\Component\Validator\Constraints as Assert;
+
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\Mapping\Entity;
-use Doctrine\ORM\Mapping\Table;
-use Doctrine\ORM\Mapping\Id;
-use Doctrine\ORM\Mapping\Column;
-use Doctrine\ORM\Mapping\GeneratedValue;
+use Symfony\Component\Security\Core\Role\RoleInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 
+
 /**
- * @ORM\Table(options={"collate"="utf8_general_ci"})
- * @ORM\Entity
+ * Role
+ *
+ * @ORM\Table(name="role")
+ * @ORM\Entity(repositoryClass="AppBundle\Repository\RoleRepository")
  */
-
-class Address
+class Role implements RoleInterface
 {
-    
+
 
     /**
-     * @return mixed
-     */
-    public function __toString() {
-        //if variable return in formbuilder in EntityType::class for example
-       // return $this->address;
-    }
-
-    /**
-     * @ORM\Column(type="integer")
+     * @var int
+     *
+     * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
-     *
      */
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=60)
+     * @var string
+     *
+     * @ORM\Column(name="roles", type="string")
      */
-    private $address;
-
+    private $roles;
 
     /**
-     * @ORM\OneToMany(targetEntity="User", mappedBy="address")
+     * @ORM\OneToMany(targetEntity="User", mappedBy="role")
      */
-    public $users;
-
-
+    private $users;
 
 
     /**
      * Get id
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {
@@ -59,37 +50,35 @@ class Address
     }
 
     /**
-     * Set address
+     * Set role
      *
-     * @param string $address
+     * @param string $role
      *
-     * @return Address
+     * @return Role
      */
-    public function setAddress($address)
+    public function setRoles($role)
     {
-        $this->address = $address;
+        $this->roles = $role;
 
         return $this;
     }
 
     /**
-     * Get address
+     * Get role
      *
      * @return string
      */
-    public function getAddress()
+    public function getRole()
     {
-        return $this->address;
+        return $this->roles;
     }
-
-
-
     /**
      * Constructor
      */
     public function __construct()
     {
         $this->users = new \Doctrine\Common\Collections\ArrayCollection();
+       // $this->role = 'ROLE_USER'; //default role
     }
 
     /**
@@ -97,7 +86,7 @@ class Address
      *
      * @param \AppBundle\Entity\User $user
      *
-     * @return Address
+     * @return Role
      */
     public function addUser(\AppBundle\Entity\User $user)
     {

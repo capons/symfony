@@ -4,14 +4,16 @@ namespace AppBundle\Repository;
 
 use Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface;
 use Doctrine\ORM\EntityRepository;
-use AppBundle\Entity\Users;
-use AppBundle\Entity\Address;
+
+
 
 class UserRepository extends EntityRepository implements UserLoaderInterface
 {
     public function loadUserByUsername($username)
     {
         return $this->createQueryBuilder('u')
+            ->select('u, g')            // for user permision group (Entity Group)
+            ->leftJoin('u.groups', 'g') // for user permission group (Entity Group)
             ->where('u.username = :username OR u.email = :email')
             ->setParameter('username', $username)
             ->setParameter('email', $username)
@@ -32,15 +34,6 @@ class UserRepository extends EntityRepository implements UserLoaderInterface
         return $all_country = $query->getResult();
     }
     */
-    public function loadUserDetailesById($id){
-        return  $this->getEntityManager()
-            ->createQuery(
-                'SELECT u.id,u.username,u.roles,u.email,a.address as user_address , c.name as country FROM AppBundle:User u 
-                        LEFT JOIN AppBundle:Address a WITH a.id = u.address 
-                        LEFT JOIN AppBundle:Country c WITH c.id = u.country
-                        WHERE u.id = '.$id.'  '
-            )
-            ->getResult();
-    }
+
 
 }

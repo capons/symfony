@@ -39,6 +39,8 @@ security:
     access_control:
                                    - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
 
+                                   # - { path: ^/login, roles: ADMIN }  # Example to access user with role -> ADMIN
+
             # activate different ways to authenticate
 
             # http_basic: ~

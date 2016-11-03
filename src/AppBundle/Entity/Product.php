@@ -28,7 +28,15 @@ class Product
 
     /**
      * @ORM\Column(type="string", length=60)
-     * */
+     * @Assert\NotNull(message="Password error (this is my custom validation message).")
+     * @Assert\Length(
+     *      min = 2,
+     *      max = 50,
+     *      minMessage = "Your password must be at least {{ limit }} characters long",
+     *      maxMessage = "Your password cannot be longer than {{ limit }} characters"
+     * )
+     *
+     */
     private $name;
     /**
      * @ORM\ManyToOne(targetEntity="Category", inversedBy="products")

@@ -5,7 +5,7 @@ namespace AppBundle\Entity;
 use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
-use AppBundle\Entity\Users;
+
 
 /**
  * Country
@@ -44,6 +44,11 @@ class Country
      * @ORM\Column(type="string", length=10)
      */
     private $code;
+
+    /**
+     * @ORM\OneToMany(targetEntity="User", mappedBy="country")
+     */
+    private $users;
 
 
 
@@ -130,4 +135,12 @@ class Country
     {
         return $this->users;
     }
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->users = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
 }

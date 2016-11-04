@@ -29,10 +29,26 @@ private $role;
 /** @ORM\ManyToMany(targetEntity="User", mappedBy="groups") */
 private $users;
 
+
+    //related with entity Country
+    /**
+     * @ORM\ManyToOne(targetEntity="Role", inversedBy="group")
+     * @ORM\JoinColumn(name="role_id", referencedColumnName="id", onDelete="CASCADE")
+     *
+     */
+    private $user_role;
+
+
+
+
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
+        //set default permission to user
         $this->setRole('ROLE_USER');
+
+
     }
 
 // ... getters and setters for each property
@@ -77,19 +93,7 @@ private $users;
         return $this->name;
     }
 
-    /**
-     * Set role
-     *
-     * @param string $role
-     *
-     * @return Group
-     */
-    public function setRole($role)
-    {
-        $this->role = $role;
-
-        return $this;
-    }
+   
 
     /**
      * Add user
@@ -124,4 +128,49 @@ private $users;
     {
         return $this->users;
     }
+
+
+
+
+    
+
+    /**
+     * Get userRole
+     *
+     * @return \AppBundle\Entity\Role
+     */
+    public function getUserRole()
+    {
+        return $this->user_role;
+    }
+
+    /**
+     * Set role
+     *
+     * @param string $role
+     *
+     * @return Group
+     */
+    public function setRole($role)
+    {
+        $this->role = $role;
+
+        return $this;
+    }
+
+    /**
+     * Set userRole
+     *
+     * @param \AppBundle\Entity\Role $userRole
+     *
+     * @return Group
+     */
+    public function setUserRole(\AppBundle\Entity\Role $userRole = null)
+    {
+        $this->user_role = $userRole;
+
+        return $this;
+    }
+
+
 }

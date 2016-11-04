@@ -13,10 +13,12 @@ use Doctrine\Common\Collections\ArrayCollection;
  */
 class Role
 {
+
     public function __toString() {
         //if variable return in formbuilder in EntityType::class for example
         return $this->role;
     }
+
     /**
      * @var int
      *
@@ -35,6 +37,7 @@ class Role
 
     /**
      * @ORM\OneToMany(targetEntity="Group", mappedBy="role")
+     *
      */
     private $group;
 
@@ -77,4 +80,45 @@ class Role
 
 
 
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->group = new ArrayCollection();
+    }
+
+    /**
+     * Add group
+     *
+     * @param \AppBundle\Entity\Group $group
+     *
+     * @return Role
+     */
+    public function addGroup(\AppBundle\Entity\Group $group)
+    {
+        $this->group[] = $group;
+
+        return $this;
+    }
+
+    /**
+     * Remove group
+     *
+     * @param \AppBundle\Entity\Group $group
+     */
+    public function removeGroup(\AppBundle\Entity\Group $group)
+    {
+        $this->group->removeElement($group);
+    }
+
+    /**
+     * Get group
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getGroup()
+    {
+        return $this->group;
+    }
 }

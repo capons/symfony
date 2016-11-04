@@ -37,40 +37,6 @@ class DefaultController extends Controller
         return $this->render('default/test.html.twig');
 
     }
-    /**
-     * @Route("/admin",name="admin")
-     */
-
-    public function adminAction(Request $request)
-    {
-        $authorizationChecker = $this->get('security.authorization_checker');
-
-        // check for auth user access
-        if (false === $authorizationChecker->isGranted('ROLE_USER')) {
-            //throw new AccessDeniedException();
-            $request->getSession()
-                ->getFlashBag()
-                ->add('error', 'You have no permission!')
-            ;
-            return $this->redirectToRoute('_homepage');
-        }
-
-        //check if user login
-
-        $securityContext = $this->container->get('security.authorization_checker');
-        if ($securityContext->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
-            $user = $this->getUser();
-           // echo $user->getId();
-        }
-
-
-        return $this->render('admin/admin.html.twig',array(
-            'test' => 'test'
-        ));
-
-    }
-
-
 
 
 

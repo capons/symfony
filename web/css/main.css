@@ -1,3 +1,6 @@
 body {
     background-color: rgba(80, 96, 109, 0.56);
 }
+#input-small {
+    width: 60px; !important;
+}

@@ -2,11 +2,61 @@
 
 {% block widget %}
 {% if is_granted('ROLE_USER') %}
-    <p>Админ может видеть это!</p>
+    <p style="text-align: center;font-size: 30px;font-family: 'Courier New'">Admin page!</p>
 {% endif %}
-Не админ
 
-    <p>user id = {{ app.user.id }}</p>
-    <p>user name = {{ app.user.username }}</p>
-    {{ test }}
+{% endblock %}
+
+{% block body %}
+
+    <div class="col-lg-12">
+        <div style="margin: 0 auto;float: none;overflow: auto" class="col-lg-10">
+            <!--display Entity Doctrine -->
+            {% for user in users %}
+                <div class="row">
+                    <div class="col-xs-1">
+                        {{ loop.index }}
+                    </div>
+                    <div class="col-xs-1">
+                        {{ user.username }}
+                    </div>
+                    {% for accessGroup in user.groups %}
+                        <div class="col-xs-4">
+                            <!--update product form -->
+                            {% if update_user_permission  %}
+                                {{ form_start(update_user_permission[loop.index0],{'attr': {'class': 'form-inline'}}) }}
+                                <div class="form-group">
+                                    {{ form_label(update_user_permission[loop.index0].role) }}
+                                    {{ form_widget(update_user_permission[loop.index0].role, {value : accessGroup.role}) }}
+                                    {{ form_widget(update_user_permission[loop.index0].id, {value : user.id}) }}
+                                </div>
+                                {{ form_widget(update_user_permission[loop.index0].save) }}
+                                {{ form_end(update_user_permission[loop.index0]) }}
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                    <div class="col-xs-1">
+                        {{ user.email }}
+                    </div>
+                    <div class="col-xs-2">
+                        {{ user.country.name }}
+                    </div>
+                    <div class="col-xs-2">
+                        {{ user.address.address }}
+                    </div>
+                    <div class="col-xs-1">
+                        {% if user.isActive == true %}
+                            <p style="background-color: #03b28f">active</p>
+                        {% else %}
+                            <p style="background-color: #8e8e8e">not active</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+            {% endfor %}
+        </div>
+    </div>
+
+
+
 {% endblock %}

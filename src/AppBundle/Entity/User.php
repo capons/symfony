@@ -35,6 +35,8 @@ class User implements  AdvancedUserInterface , \Serializable
     }
 
 
+
+
     /**
      * @ORM\Column(type="integer")
      * @ORM\Id
@@ -67,7 +69,7 @@ class User implements  AdvancedUserInterface , \Serializable
     private $password;
 
 
-    //user permission group
+    //user permission group (relation with Group entity)
     /**
      * @ORM\ManyToMany(targetEntity="Group", inversedBy="users")
      *

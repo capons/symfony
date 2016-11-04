@@ -7,7 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
-* @ORM\Table(name="user_permission_groups")
+* @ORM\Table(name="user_permission")
 * @ORM\Entity()
 */
 class Group implements RoleInterface
@@ -25,12 +25,28 @@ private $name;
 /** @ORM\Column(name="role", type="string", length=20) */
 private $role;
 
+    //relationship with User entity
 /** @ORM\ManyToMany(targetEntity="User", mappedBy="groups") */
 private $users;
 
+
+    //related with entity Country
+    /**
+     * @ORM\ManyToOne(targetEntity="Role", inversedBy="group")
+     * @ORM\JoinColumn(name="role_id", referencedColumnName="id", onDelete="CASCADE")
+     *
+     */
+    private $user_role;
+
+
+
+
+
     public function __construct()
     {
-    $this->users = new ArrayCollection();
+        $this->users = new ArrayCollection();
+        //set default permission to user
+        $this->setRole('ROLE_USER');
     }
 
 // ... getters and setters for each property
@@ -75,19 +91,7 @@ private $users;
         return $this->name;
     }
 
-    /**
-     * Set role
-     *
-     * @param string $role
-     *
-     * @return Group
-     */
-    public function setRole($role)
-    {
-        $this->role = $role;
-
-        return $this;
-    }
+   
 
     /**
      * Add user
@@ -121,5 +125,34 @@ private $users;
     public function getUsers()
     {
         return $this->users;
+    }
+
+
+
+
+    
+
+    /**
+     * Get userRole
+     *
+     * @return \AppBundle\Entity\Role
+     */
+    public function getUserRole()
+    {
+        return $this->user_role;
+    }
+
+    /**
+     * Set role
+     *
+     * @param string $role
+     *
+     * @return Group
+     */
+    public function setRole($role)
+    {
+        $this->role = $role;
+
+        return $this;
     }
 }

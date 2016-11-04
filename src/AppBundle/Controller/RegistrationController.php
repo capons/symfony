@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use AppBundle\Entity\User;
 use AppBundle\Form\Type\UserType;
 use AppBundle\Entity\Group;
+use AppBundle\Entity\Role;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
@@ -38,6 +39,9 @@ class RegistrationController extends Controller{
         $user = new User();
         $address = new Address();
         $user_permission = new Group();
+
+
+
 
 
 
@@ -75,11 +79,20 @@ class RegistrationController extends Controller{
             if($check_duplicat_email){
                 $request->getSession()
                     ->getFlashBag()
-                    ->add('error', 'Email already exist!')
+                    ->add('reg_error', 'Email already exist!')
                 ;
                 $url = $this->generateUrl('_homepage');
                 return $this->redirect($url);
             }
+
+            //find user permission by name
+            $role_name = $user_permission->getRole();
+            $em = $this->getDoctrine()->getManager();
+            $user_role = $em->getRepository('AppBundle:Role')
+                ->loadRoleByRolename($role_name); //my custom repository
+            //*/
+
+
             //save form data to database
             $address->setAddress($form["addre"]->getData());
             $pwd=$user->getPassword();
@@ -89,8 +102,11 @@ class RegistrationController extends Controller{
             $user->setAddress($address);
             //add user permission
             $user_permission->setName($form["username"]->getData());
+            $user_permission->setUserRole($user_role);
+
             $user->addGroup($user_permission);
             $em = $this->getDoctrine()->getManager();
+
             $em->persist($address);
             $em->persist($user);
             $em->persist($user_permission);
@@ -98,7 +114,7 @@ class RegistrationController extends Controller{
             $em->flush();
             $request->getSession()
                 ->getFlashBag()
-                ->add('success', 'You have successfully registered!')
+                ->add('reg_success', 'You have successfully registered!')
             ;
             return $this->redirectToRoute('_registration');
 

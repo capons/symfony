@@ -4,7 +4,7 @@ namespace AppBundle\Form\Type;
 
 use Symfony\Component\Form\FormInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
-use AppBundle\Entity\Users;
+
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -30,7 +30,7 @@ class UserType extends AbstractType
                 'required' => true,
                 'label' => 'Login',
                 'attr' => array(
-                    'maxlength' => 4,
+                    'maxlength' => 30,
                     'value' => 'bog',
                     'class' => 'form-control'
                 )
@@ -60,6 +60,8 @@ class UserType extends AbstractType
                 'choice_label' => 'name',
 
             ))
+
+
 
 
             ->add('password', PasswordType::class,array(

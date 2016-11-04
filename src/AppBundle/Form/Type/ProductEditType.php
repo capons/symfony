@@ -16,33 +16,32 @@ use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormTypeInterface;
 
-class ProductType extends AbstractType
+class ProductEditType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
 
+
             ->add('name', TextType::class,array(
                 'required' => true,
-                'label' => 'Add product',
-                'attr' => array(
-                    'maxlength' => 50,
-                    'value' => 'new product',
-                    'class' => 'form-control'
-                )
-            ))
-            ->add('cat', TextType::class,array(
-                'required' => true,
-                'label' => 'Add category',
+                'label' => 'Modify name',
                 'attr' => array(
                     'maxlength' => 20,
-                    'value' => 'new category',
-                    'class' => 'form-control'
+                    'class' => 'form-control',
                 )
             ))
-            ->add('save', SubmitType::class, array('label' => 'Create Category'));
+            ->add('id', HiddenType::class)
+
+            ->add('save', SubmitType::class, array(
+                'label' => 'Update name',
+                'attr' => array(
+                    'class' => 'btn btn-danger',
+                    )
+            ));
 
     }
     public function configureOptions(OptionsResolver $resolver)

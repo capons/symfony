@@ -1,7 +1,6 @@
 {% extends 'app.php.twig' %}
 
 {% block widget %}
-
     <p>sales blog</p>
 
     {% if category_form  %}
@@ -53,31 +52,65 @@
 {% block body %}
     <div class="col-lg-12">
 
+
+
+
+
+
+
+
+        <!--display update form error message -->
+        {% if app.session.flashBag.has('error') %}
+            {% for msg in app.session.flashBag.get('error') %}
+                {% for msginput in  msg  %}
+                    {% for message in   msginput  %}
+                        <div class="alert alert-warning">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+            {% endfor %}
+        {% endif %}
+        <!--display all product -->
         {% for item in product %}
-            <div style="margin: 0 auto;float: none" class="col-xs-6">
+            <div style="margin: 0 auto;float: none;overflow: auto;zoom: 1;" class="col-xs-10">
                 <div style="padding: 10px; background-color: cornflowerblue; color: ghostwhite;margin-bottom: 5px" class="col-xs-12">
                     <div  class="col-xs-8">
                         <div style="margin-top: 5px;" class="col-xs-4">
                             <a style="color:white" href="{{ path('_product_detailes',{'productId': item.id}) }}">{{ loop.index }} click to detailes</a>
                         </div>
                         <div class="col-xs-8">
-                            <form method="POST" action="{{ path('_product_update')}}">
-                                <input style="background-color: #1E1E1E;border: none" name="product_name" value="{{ item.name }}">
-                                <input type="hidden" name="product_id" value="{{ item.id }}">
-                                <input type="submit" class="btn btn-danger" value="Update">
-                            </form>
+                            <!--update product form -->
+                            {% if produt_edit_form  %}
+                                {{ form_start(produt_edit_form[loop.index0],{'attr': {'class': 'form-inline'}}) }}
+                                <div class="form-group">
+                                    {{ form_label(produt_edit_form[loop.index0].name) }}
+                                    {{ form_widget(produt_edit_form[loop.index0].name, {value : item.name}) }}
+                                    {{ form_widget(produt_edit_form[loop.index0].id, {value : item.id}) }}
+                                </div>
+                                    {{ form_widget(produt_edit_form[loop.index0].save) }}
+                                {{ form_end(produt_edit_form[loop.index0]) }}
+                            {% endif %}
                         </div>
 
                     </div>
                     <div class="col-xs-4">
-
+                        <!--
                         <form method="POST" action="{{ path('_product_delete')}}">
                             <input type="hidden" name="product_id" value="{{ item.id }}">
                             <input type="submit" class="btn btn-danger" value="Delete">
                         </form>
-                        <!--
-                        <a class="btn btn-danger" href="{{ path('_product_delete',{'productId': item.id}) }}">Delete</a>
                         -->
+                        <!--delete product form -->
+                        {% if product_delete_form  %}
+                            {{ form_start(product_delete_form[loop.index0],{'attr': {'class': 'form-inline'}}) }}
+                            <div class="form-group">
+                                {{ form_widget(product_delete_form[loop.index0].id, {value : item.id}) }}
+                            </div>
+                            {{ form_widget(product_delete_form[loop.index0].save) }}
+                            {{ form_end(product_delete_form[loop.index0]) }}
+                        {% endif %}
+
                     </div>
                 </div>
             </div>

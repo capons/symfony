@@ -24,16 +24,21 @@ class Product
      * @ORM\GeneratedValue(strategy="AUTO")
      *
      */
-    private $id;
+    public $id;
 
     /**
      * @ORM\Column(type="string", length=60)
-     * @Assert\NotNull(message="Password error (this is my custom validation message).")
+     * @Assert\NotNull(message="Product need name!.")
      * @Assert\Length(
-     *      min = 2,
+     *      min = 4,
      *      max = 50,
-     *      minMessage = "Your password must be at least {{ limit }} characters long",
-     *      maxMessage = "Your password cannot be longer than {{ limit }} characters"
+     *      minMessage = "Product name must be longer {{ limit }} characters long",
+     *      maxMessage = "Product name cannot be longer than {{ limit }} characters"
+     * )
+     * @Assert\Regex(
+     *     pattern="/\d/",
+     *     match=false,
+     *     message="Your name cannot contain a number"
      * )
      *
      */

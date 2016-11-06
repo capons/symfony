@@ -49,6 +49,7 @@ class AdminController extends Controller {
         foreach ($users as $key=>$val){
             $form_edit_array[] =  $this->userUpdatePermission()->createView();
         }
+
         return $this->render('admin/admin.html.twig',array(
             'users' => $users,
             'update_user_permission' => $form_edit_array

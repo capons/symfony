@@ -16,7 +16,7 @@ class UserUpdatePermissionType extends AbstractType
     {
         $builder
 
-            ->add('role', EntityType::class, array(
+            ->add('user_role', EntityType::class, array(
                 'class' => 'AppBundle:Role',
                 'choice_label' => 'role',
 

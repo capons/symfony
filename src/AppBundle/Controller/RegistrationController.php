@@ -90,6 +90,7 @@ class RegistrationController extends Controller{
             $em = $this->getDoctrine()->getManager();
             $user_role = $em->getRepository('AppBundle:Role')
                 ->loadRoleByRolename($role_name); //my custom repository
+
             //*/
 
 
@@ -103,6 +104,7 @@ class RegistrationController extends Controller{
             //add user permission
             $user_permission->setName($form["username"]->getData());
             $user_permission->setUserRole($user_role);
+
 
             $user->addGroup($user_permission);
             $em = $this->getDoctrine()->getManager();
@@ -119,9 +121,6 @@ class RegistrationController extends Controller{
             return $this->redirectToRoute('_registration');
 
         } else {
-
-
-
 
 
 

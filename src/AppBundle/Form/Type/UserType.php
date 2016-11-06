@@ -61,9 +61,6 @@ class UserType extends AbstractType
 
             ))
 
-
-
-
             ->add('password', PasswordType::class,array(
                 'required' => true,
                 'attr' => array(

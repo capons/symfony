@@ -71,7 +71,7 @@ class User implements  AdvancedUserInterface , \Serializable
 
     //user permission group (relation with Group entity)
     /**
-     * @ORM\ManyToMany(targetEntity="Group", inversedBy="users")
+     * @ORM\ManyToMany(targetEntity="Group", inversedBy="users",cascade={"persist", "remove"}))
      *
      */
     private $groups;

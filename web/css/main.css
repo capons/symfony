@@ -4,3 +4,8 @@ body {
 #input-small {
     width: 60px; !important;
 }
+.user_titel {
+    color: cornsilk;
+    font-size: 15px;
+    font-family: 'Courier New';
+}

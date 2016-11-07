@@ -61,6 +61,52 @@ class AdminController extends Controller {
      */
     public function updatePermissionAction(Request $request){
 
+
+        $form = $this->userUpdatePermission();
+        $form->handleRequest($request);
+        //$validator = $this->get('validator');
+
+        $errors = $this->getErrorMessages($form);
+
+        if($form->isValid()){
+            $em = $this->getDoctrine()->getManager();
+            //new role_access
+            $new_role = $form["user_role"]->getData();
+            //find role object by ROLE name
+            $user_role = $em->getRepository('AppBundle:Role')
+                ->loadRoleByRolename($new_role->getRole()); //my custom repository
+            //user_id
+            $user_id = $form["user_id"]->getData();
+            //group_id
+            $group_id = $form->getData()->getId();
+            $group = $em->getRepository('AppBundle:Group')->find($group_id);
+            $user = $em->getRepository('AppBundle:User')->find($user_id);
+            $user->removeGroup($group);
+            $em->remove($group);
+            $em->persist($user);
+            $em->flush();
+            //remove old user data
+
+            //update new
+            $user_permission = new Group();
+            $user_permission->setName($user->getUsername());
+            $user_permission->setRole($new_role->getRole());
+            $user_permission->setUserRole($user_role);
+            $user->addGroup($user_permission);
+            $em->persist($user);
+            $em->persist($user_permission);
+
+            $em->flush();
+
+            return $this->redirectToRoute('admin');
+        } else {
+
+            $request->getSession()
+                ->getFlashBag()
+                ->add('error', $errors);
+            return $this->redirectToRoute('admin');
+        }
+
     }
 
     public function userUpdatePermission()

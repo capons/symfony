@@ -17,7 +17,9 @@ class Group implements RoleInterface
 * @ORM\Id()
 * @ORM\GeneratedValue(strategy="AUTO")
 */
-private $id;
+public $id;
+
+public $user_id;
 
 /** @ORM\Column(name="name", type="string", length=30) */
 private $name;
@@ -36,7 +38,7 @@ private $users;
      * @ORM\JoinColumn(name="role_id", referencedColumnName="id", onDelete="CASCADE")
      *
      */
-    private $user_role;
+    public $user_role;
 
 
 
@@ -47,6 +49,8 @@ private $users;
         $this->users = new ArrayCollection();
         //set default permission to user
         $this->setRole('ROLE_USER');
+
+
     }
 
 // ... getters and setters for each property
@@ -155,4 +159,20 @@ private $users;
 
         return $this;
     }
+
+    /**
+     * Set userRole
+     *
+     * @param \AppBundle\Entity\Role $userRole
+     *
+     * @return Group
+     */
+    public function setUserRole(\AppBundle\Entity\Role $userRole = null)
+    {
+        $this->user_role = $userRole;
+
+        return $this;
+    }
+
+
 }

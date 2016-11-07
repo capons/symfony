@@ -17,7 +17,9 @@ class Group implements RoleInterface
 * @ORM\Id()
 * @ORM\GeneratedValue(strategy="AUTO")
 */
-private $id;
+public $id;
+
+public $user_id;
 
 /** @ORM\Column(name="name", type="string", length=30) */
 private $name;
@@ -36,7 +38,7 @@ private $users;
      * @ORM\JoinColumn(name="role_id", referencedColumnName="id", onDelete="CASCADE")
      *
      */
-    private $user_role;
+    public $user_role;
 
 
 

@@ -41,19 +41,10 @@ class RegistrationController extends Controller{
         $user_permission = new Group();
 
 
-
-
-
-
         //create form
-
         $form = $this->createForm(UserType::class, $user); // UserType form builder class
-
-
         $form->handleRequest($request);
         //validate form
-
-
         $validator = $this->get('validator');
 
         $errors = $validator->validate($user);

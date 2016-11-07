@@ -22,17 +22,19 @@ use Symfony\Component\Security\Core\User\AdvancedUserInterface;
  * @ORM\Table(name="user",options={"collate"="utf8_general_ci"})
  * @ORM\Entity(repositoryClass="AppBundle\Repository\UserRepository")
  */
-class User implements  AdvancedUserInterface , \Serializable//UserInterface , \Serializable
+class User implements  AdvancedUserInterface , \Serializable
 {
 
     public function __construct()
     {
         //set default Entity variable
         $this->isActive = true;
-     //   $this->roles = 'ROLE_USER'; //default role
+        //for user permission gtoup;
         $this->groups = new ArrayCollection();
 
     }
+
+
 
 
     /**
@@ -67,13 +69,9 @@ class User implements  AdvancedUserInterface , \Serializable//UserInterface , \S
     private $password;
 
 
+    //user permission group (relation with Group entity)
     /**
-     * @ORM\Column(type="string", length=64)
-     */
-   // private $roles;
-
-    /**
-     * @ORM\ManyToMany(targetEntity="Group", inversedBy="users")
+     * @ORM\ManyToMany(targetEntity="Group", inversedBy="users",cascade={"persist", "remove"}))
      *
      */
     private $groups;
@@ -127,7 +125,7 @@ class User implements  AdvancedUserInterface , \Serializable//UserInterface , \S
     public function eraseCredentials()
     {
     }
-
+    //if return false -> user set permission with zero access
     public function isAccountNonExpired()
     {
         return true;
@@ -356,10 +354,20 @@ class User implements  AdvancedUserInterface , \Serializable//UserInterface , \S
         return $this->country;
     }
 
+    /**
+     * @return mixed
+     * get user address
+     */
     public function getAddre()
     {
         return $this->addre;
     }
+
+    /**
+     * @param $address
+     * @return mixed
+     * set user address
+     */
     public function setAddre($address)
     {
         return $this->addre = $address;

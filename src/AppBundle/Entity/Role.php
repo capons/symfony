@@ -16,7 +16,7 @@ class Role
 
     public function __toString() {
         //if variable return in formbuilder in EntityType::class for example
-        return $this->role;
+        return $this->role; //need in choice form type
     }
 
     /**
@@ -34,6 +34,12 @@ class Role
      * @ORM\Column(name="role", type="string", length=50, columnDefinition="enum('ROLE_USER', 'ROLE_ADMIN', 'ROLE_MANAGER')")
      */
     private $role;
+
+    /**
+     * @ORM\Column(name="role_label", type="string", length=50)
+     */
+    public $role_label;
+
 
     /**
      * @ORM\OneToMany(targetEntity="Group", mappedBy="role")
@@ -120,5 +126,29 @@ class Role
     public function getGroup()
     {
         return $this->group;
+    }
+
+    /**
+     * Set roleLabel
+     *
+     * @param string $roleLabel
+     *
+     * @return Role
+     */
+    public function setRoleLabel($roleLabel)
+    {
+        $this->role_label = $roleLabel;
+
+        return $this;
+    }
+
+    /**
+     * Get roleLabel
+     *
+     * @return string
+     */
+    public function getRoleLabel()
+    {
+        return $this->role_label;
     }
 }
